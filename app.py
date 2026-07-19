@@ -14,7 +14,8 @@ def create_app():
 
     app.config["SECRET_KEY"] = "replace-with-a-secure-secret-key"
     #DB
-    app.config["SQLALCHEMY_DATABASE_URI"] = (f"mysql+pymysql://root:mysql@localhost:3306/attendance_db")
+    #app.config["SQLALCHEMY_DATABASE_URI"] = (f"mysql+pymysql://root:mysql@localhost:3306/attendance_db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = (f"sqlite:///{database_path.as_posix()}")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
