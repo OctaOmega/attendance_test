@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Office Party Attendance
+{% endblock %}
+
+{% block content %}
+    <section class="summary-grid">
+        <article class="summary-card">
+            <span>Total responses</span>
+            <strong>{{ total_responses }}</strong>
+        </article>
+
+        <article class="summary-card">
+            <span>Employees attending</span>
+            <strong>{{ attending_employees }}</strong>
+        </article>
+
+        <article class="summary-card">
+            <span>Total people attending</span>
+            <strong>{{ total_people_attending }}</strong>
+        </article>
+    </section>
+
+    <section class="card">
+        <h2>Add attendance response</h2>
+
+        <form
+            action="{{ url_for('add_attendee') }}"
+            method="post"
+            class="form-grid"
+        >
+            <div class="form-field">
+                <label for="name">Employee name</label>
+
+                <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="email">Email</label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="department">Department</label>
+
+                <input
+                    id="department"
+                    name="department"
+                    type="text"
+                    placeholder="For example, Finance"
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="attendance_status">
+                    Attendance status
+                </label>
+
+                <select
+                    id="attendance_status"
+                    name="attendance_status"
+                    required
+                >
+                    <option value="">Select a status</option>
+                    <option value="Attending">Attending</option>
+                    <option value="Not attending">
+                        Not attending
+                    </option>
+                    <option value="Maybe">Maybe</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="guest_count">Number of guests</label>
+
+                <input
+                    id="guest_count"
+                    name="guest_count"
+                    type="number"
+                    min="0"
+                    value="0"
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="dietary_requirements">
+                    Dietary requirements
+                </label>
+
+                <input
+                    id="dietary_requirements"
+                    name="dietary_requirements"
+                    type="text"
+                    placeholder="Vegetarian, allergies, etc."
+                >
+            </div>
+
+            <div class="full-width">
+                <button type="submit">
+                    Save response
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card">
+        <div class="section-heading">
+            <h2>Attendance records</h2>
+
+            <span>
+                {{ attendees | length }} result(s)
+            </span>
+        </div>
+
+        <form method="get" class="search-form">
+            <input
+                type="search"
+                name="search"
+                value="{{ search_term }}"
+                placeholder="Search by name, email, department, or status"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+            {% if search_term %}
+                <a
+                    href="{{ url_for('index') }}"
+                    class="secondary-button"
+                >
+                    Clear
+                </a>
+            {% endif %}
+        </form>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Guests</th>
+                        <th>Dietary requirements</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for attendee in attendees %}
+                        <tr>
+                            <td>{{ attendee.name }}</td>
+                            <td>{{ attendee.email }}</td>
+
+                            <td>
+                                {{ attendee.department or "—" }}
+                            </td>
+
+                            <td>
+                                <span
+                                    class="status status-{{
+                                        attendee.attendance_status
+                                        | lower
+                                        | replace(' ', '-')
+                                    }}"
+                                >
+                                    {{ attendee.attendance_status }}
+                                </span>
+                            </td>
+
+                            <td>{{ attendee.guest_count }}</td>
+
+                            <td>
+                                {{
+                                    attendee.dietary_requirements
+                                    or "—"
+                                }}
+                            </td>
+
+                            <td>
+                                <form
+                                    action="{{
+                                        url_for(
+                                            'delete_attendee',
+                                            attendee_id=attendee.id
+                                        )
+                                    }}"
+                                    method="post"
+                                    class="delete-form"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="delete-button"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                No attendance records found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}
